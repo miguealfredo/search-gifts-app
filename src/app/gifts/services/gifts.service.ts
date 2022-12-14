@@ -7,10 +7,12 @@ import { Gift, SearchGiftsResponse } from '../interfeces/gitfs.interfaces';
 @Injectable({
   providedIn: 'root'
 })
-export class GiftsService {
+export class GiftsService 
+{
   public results: Gift[] = [];
   
-  get historial(){
+  get historial()
+  {
     return [...this._historial];
   }
 
@@ -24,7 +26,8 @@ export class GiftsService {
    * 
    * @param httpClient 
    */
-  constructor(
+  constructor
+  (
     private httpClient:HttpClient
   ){
     
@@ -61,13 +64,14 @@ export class GiftsService {
    * @param query 
    * @returns 
    */
-  private getImages = (query:string):Observable<SearchGiftsResponse> => {
+  private getImages = (q:string):Observable<SearchGiftsResponse> => 
+  {
     return this.httpClient.get<SearchGiftsResponse>(
       this.baseUrl,
       {
         params:{
           api_key:this.apiKey,
-          q:query,
+          q,
           limit:this.giftsLimit
         }
       }
@@ -78,16 +82,26 @@ export class GiftsService {
    * @param query 
    * @returns 
    */
-  public searchGifts(query:string=''):any{
+  public searchGifts = (query:string=''):any => 
+  {
     query = this.formatQuery(query);
     if(this.validateEmptyQuery(query)) return  null;
-    if(this.validateRepetedNameItem(this._historial,query)) return null
-    this._historial= this.checkOnlyNineItems(this._historial)
+    if(!this.validateRepetedNameItem(this._historial,query))
+      this.historialBuild(query);
+    this.giftsLoad(query);
+  }
+
+  private historialBuild = (query:string):void =>
+  {
+    this._historial= this.checkOnlyNineItems(this._historial);
     this._historial.unshift(query);
-    localStorage.setItem(this.localStorageHistorial, JSON.stringify(this._historial))
+    localStorage.setItem(this.localStorageHistorial, JSON.stringify(this._historial));
+  }
+
+  private giftsLoad = (query:string):void => 
+  {
     this.getImages(query).subscribe( ( resp:SearchGiftsResponse ) => this.results = resp.data);
-    localStorage.setItem(this.localStorageResult, JSON.stringify(this.results))
-    
+    localStorage.setItem(this.localStorageResult, JSON.stringify(this.results));
   }
 
 

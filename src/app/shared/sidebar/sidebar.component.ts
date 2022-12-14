@@ -11,9 +11,14 @@ export class SidebarComponent {
   constructor(
     private giftsService:GiftsService,
   ){}
-  
+
   get historial(){
     return this.giftsService.historial;
+  }
+
+  public search(query:string){
+    console.log(query)
+    this.giftsService.searchGifts(query);
   }
 
 }
