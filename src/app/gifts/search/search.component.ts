@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { GiftsService } from '../services/gifts.service';
 
 @Component({
   selector: 'app-search',
@@ -6,7 +7,16 @@ import { Component } from '@angular/core';
   styleUrls: ['./search.component.css']
 })
 export class SearchComponent {
-  public search(search:string) {
-    console.log('key',search)
+
+  @ViewChild('txtSearch') txtSearch!:ElementRef<HTMLInputElement>;
+
+  constructor(
+    private giftsService:GiftsService,
+  ){}
+
+  public search() {
+    const value = this.txtSearch.nativeElement.value;
+    this.giftsService.searchGifts(value)
+    this.txtSearch.nativeElement.value = '';
   }
 }
