@@ -12,6 +12,7 @@ export class SearchComponent {
 
   constructor(
     private giftsService:GiftsService,
+    
   ){}
 
   public search() {
