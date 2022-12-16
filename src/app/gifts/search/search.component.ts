@@ -9,10 +9,12 @@ import { GiftsService } from '../services/gifts.service';
 export class SearchComponent {
 
   @ViewChild('txtSearch') txtSearch!:ElementRef<HTMLInputElement>;
-
+  get queryLast(){
+    return this.giftsService.queryLast
+  }
   constructor(
     private giftsService:GiftsService,
-    
+
   ){}
 
   public search() {

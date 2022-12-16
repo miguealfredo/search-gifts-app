@@ -17,7 +17,6 @@ export class SidebarComponent {
   }
 
   public search(query:string){
-    console.log(query)
     this.giftsService.searchGifts(query);
   }
 

@@ -1,5 +1,5 @@
 import { query } from '@angular/animations';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Gift, SearchGiftsResponse } from '../interfeces/gitfs.interfaces';
@@ -10,6 +10,7 @@ import { Gift, SearchGiftsResponse } from '../interfeces/gitfs.interfaces';
 export class GiftsService 
 {
   public results: Gift[] = [];
+  public queryLast: string = '';
   
   get historial()
   {
@@ -21,6 +22,7 @@ export class GiftsService
   private _historial: string[] = [];
   private localStorageHistorial:string = 'historial'
   private localStorageResult:string = 'results'
+  private localStorageQuery:string = 'query'
   private giftsLimit:number = 10;
   /**
    * 
@@ -33,6 +35,8 @@ export class GiftsService
     
     this._historial = JSON.parse( localStorage.getItem(this.localStorageHistorial)! ) || []
     this.results = JSON.parse( localStorage.getItem(this.localStorageResult)! ) || []
+    this.queryLast = JSON.parse( localStorage.getItem(this.localStorageQuery)! ) || []
+
   }
   
    /* 
@@ -66,16 +70,11 @@ export class GiftsService
    */
   private getImages = (q:string):Observable<SearchGiftsResponse> => 
   {
-    return this.httpClient.get<SearchGiftsResponse>(
-      this.baseUrl,
-      {
-        params:{
-          api_key:this.apiKey,
-          q,
-          limit:this.giftsLimit
-        }
-      }
-    )
+    const params =  new HttpParams()
+    .set('api_key',this.apiKey)
+    .set('q',q)
+    .set('limit',this.giftsLimit);
+    return this.httpClient.get<SearchGiftsResponse>(this.baseUrl,{params});
   }
   /**
    * 
@@ -89,15 +88,24 @@ export class GiftsService
     if(!this.validateRepetedNameItem(this._historial,query))
       this.historialBuild(query);
     this.giftsLoad(query);
-  }
+    localStorage.setItem(this.localStorageQuery, JSON.stringify(query));
+    this.queryLast = JSON.parse( localStorage.getItem(this.localStorageQuery)! ) || []
 
+  }
+  /**
+   * 
+   * @param query 
+   */
   private historialBuild = (query:string):void =>
   {
     this._historial= this.checkOnlyNineItems(this._historial);
     this._historial.unshift(query);
     localStorage.setItem(this.localStorageHistorial, JSON.stringify(this._historial));
   }
-
+  /**
+   * 
+   * @param query 
+   */
   private giftsLoad = (query:string):void => 
   {
     this.getImages(query).subscribe( ( resp:SearchGiftsResponse ) => this.results = resp.data);
